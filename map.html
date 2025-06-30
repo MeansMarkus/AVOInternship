@@ -1,13 +1,242 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Property PLanning Map</title>
+    <title>Oklahoma Property Planning - Sprinkler & Drain System Designer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
-    <style>
-
-    </style>
-    <head>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
 <body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-map-marked-alt"></i> Oklahoma Property Planning</h1>
+                <p>Interactive Sprinkler & Drain System Designer</p>
+            </div>
+            <div class="header-controls">
+                <button id="saveProject" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Project
+                </button>
+                <button id="loadProject" class="btn btn-secondary">
+                    <i class="fas fa-folder-open"></i> Load Project
+                </button>
+                <button id="exportImage" class="btn btn-success">
+                    <i class="fas fa-download"></i> Export Image
+                </button>
+            </div>
+        </header>
 
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-search"></i> Property Search</h3>
+                    <div class="search-container">
+                        <input type="text" id="addressInput" placeholder="Enter Oklahoma address..." />
+                        <button id="searchBtn" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="quick-locations">
+                        <h4>Quick Locations</h4>
+                        <button class="location-btn" data-lat="35.4676" data-lng="-97.5164">Oklahoma City</button>
+                        <button class="location-btn" data-lat="36.1540" data-lng="-95.9928">Tulsa</button>
+                        <button class="location-btn" data-lat="35.2226" data-lng="-97.4395">Norman</button>
+                        <button class="location-btn" data-lat="35.3395" data-lng="-97.4867">Edmond</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-tools"></i> Components</h3>
+                    
+                    <!-- Sprinkler Components -->
+                    <div class="component-group">
+                        <h4><i class="fas fa-tint"></i> Sprinkler Components</h4>
+                        <div class="component-item" data-type="sprinkler-head" data-component="rotor">
+                            <i class="fas fa-circle"></i>
+                            <span>Rotor Head</span>
+                        </div>
+                        <div class="component-item" data-type="sprinkler-head" data-component="spray">
+                            <i class="fas fa-dot-circle"></i>
+                            <span>Spray Head</span>
+                        </div>
+                        <div class="component-item" data-type="sprinkler-head" data-component="drip">
+                            <i class="fas fa-tint"></i>
+                            <span>Drip Line</span>
+                        </div>
+                        <div class="component-item" data-type="sprinkler-pipe">
+                            <i class="fas fa-minus"></i>
+                            <span>Main Line</span>
+                        </div>
+                        <div class="component-item" data-type="sprinkler-pipe" data-component="lateral">
+                            <i class="fas fa-minus"></i>
+                            <span>Lateral Line</span>
+                        </div>
+                    </div>
+
+                    <!-- Drain Components -->
+                    <div class="component-group">
+                        <h4><i class="fas fa-water"></i> Drain Components</h4>
+                        <div class="component-item" data-type="drain" data-component="catch-basin">
+                            <i class="fas fa-circle"></i>
+                            <span>Catch Basin</span>
+                        </div>
+                        <div class="component-item" data-type="drain" data-component="drain-pipe">
+                            <i class="fas fa-minus"></i>
+                            <span>Drain Pipe</span>
+                        </div>
+                        <div class="component-item" data-type="drain" data-component="french-drain">
+                            <i class="fas fa-minus"></i>
+                            <span>French Drain</span>
+                        </div>
+                        <div class="component-item" data-type="drain" data-component="dry-well">
+                            <i class="fas fa-circle"></i>
+                            <span>Dry Well</span>
+                        </div>
+                    </div>
+
+                    <!-- Property Elements -->
+                    <div class="component-group">
+                        <h4><i class="fas fa-home"></i> Property Elements</h4>
+                        <div class="component-item" data-type="property" data-component="house">
+                            <i class="fas fa-home"></i>
+                            <span>House</span>
+                        </div>
+                        <div class="component-item" data-type="property" data-component="driveway">
+                            <i class="fas fa-road"></i>
+                            <span>Driveway</span>
+                        </div>
+                        <div class="component-item" data-type="property" data-component="patio">
+                            <i class="fas fa-square"></i>
+                            <span>Patio</span>
+                        </div>
+                        <div class="component-item" data-type="property" data-component="garden">
+                            <i class="fas fa-seedling"></i>
+                            <span>Garden</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-cog"></i> Settings</h3>
+                    <div class="setting-group">
+                        <label>Map Style:</label>
+                        <select id="mapStyle">
+                            <option value="satellite">Satellite View</option>
+                            <option value="hybrid">Hybrid View</option>
+                            <option value="street">Street View</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Component Size:</label>
+                        <input type="range" id="componentSize" min="10" max="50" value="20" />
+                    </div>
+                    <div class="setting-group">
+                        <label>Show Measurements:</label>
+                        <input type="checkbox" id="showMeasurements" checked />
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-info-circle"></i> Project Info</h3>
+                    <div class="project-info">
+                        <div class="info-item">
+                            <span>Components:</span>
+                            <span id="componentCount">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Area:</span>
+                            <span id="propertyArea">0 sq ft</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Estimated Cost:</span>
+                            <span id="estimatedCost">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Map Container -->
+            <main class="map-container">
+                <div id="map"></div>
+                
+                <!-- Map Controls -->
+                <div class="map-controls">
+                    <button id="zoomIn" class="map-btn" title="Zoom In">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button id="zoomOut" class="map-btn" title="Zoom Out">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button id="resetView" class="map-btn" title="Reset View">
+                        <i class="fas fa-home"></i>
+                    </button>
+                    <button id="measureTool" class="map-btn" title="Measure Tool">
+                        <i class="fas fa-ruler"></i>
+                    </button>
+                    <button id="clearAll" class="map-btn" title="Clear All">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+
+                <!-- Component Properties Panel -->
+                <div id="propertiesPanel" class="properties-panel hidden">
+                    <div class="panel-header">
+                        <h3>Component Properties</h3>
+                        <button id="closeProperties" class="close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="panel-content">
+                        <div class="property-group">
+                            <label>Type:</label>
+                            <span id="componentType"></span>
+                        </div>
+                        <div class="property-group">
+                            <label>Size:</label>
+                            <input type="text" id="componentSizeInput" />
+                        </div>
+                        <div class="property-group">
+                            <label>Color:</label>
+                            <input type="color" id="componentColor" />
+                        </div>
+                        <div class="property-group">
+                            <label>Notes:</label>
+                            <textarea id="componentNotes"></textarea>
+                        </div>
+                        <div class="property-actions">
+                            <button id="deleteComponent" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                            <button id="duplicateComponent" class="btn btn-secondary">
+                                <i class="fas fa-copy"></i> Duplicate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <span>Oklahoma Property Planning Tool</span>
+                <span id="coordinates">Lat: 0, Lng: 0</span>
+                <span id="zoomLevel">Zoom: 0</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/sprinkler.js"></script>
+    <script src="js/drain.js"></script>
+    <script src="js/geocode.js"></script>
+    <script src="js/calculator.js"></script>
 </body>
+</html>
